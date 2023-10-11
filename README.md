@@ -1,4 +1,3 @@
-# Enumerable
 # 📗 Table of Contents
 
 - [📖 About the Project](#about-project)
@@ -15,9 +14,9 @@
 
 <!-- PROJECT DESCRIPTION -->
     
-# 📖 Enumerable <a name="about-project"></a>
+# 📖 School Library <a name="about-project"></a>
 
-In this project we replicated the method thus #all?, #any? and filter in my enumerable module.
+The school library serves as the custodian of OOP University, meticulously maintaining records of available books within its shelves and diligently tracking the borrowers of these literary treasures.
 
 ## 🛠 Built With <a name="built-with"></a>
 * Ruby
@@ -33,9 +32,9 @@ In this project we replicated the method thus #all?, #any? and filter in my enum
 <!-- Features -->
 
 ### Key Features <a name="key-features"></a>
-- **Use the #all? method**
-- **Use the #any? method**
-- **Use the #filter method**
+- **Add new students or teachers**
+- **Add new books**
+- **Save records of who borrowed a given book and when**
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -50,9 +49,9 @@ In this project we replicated the method thus #all?, #any? and filter in my enum
 ### Setup
 
 Clone this repository to your desired folder:
-- git clone https://github.com/mershark/Enumerable.git
+- git clone https://github.com/mershark/oop-school-library.git
 
-- cd Enumerable
+- cd oop-school-library
 
 <!-- AUTHORS -->
 
@@ -69,7 +68,7 @@ Clone this repository to your desired folder:
 
 ## 🔭Features <a name="future-features"></a>
 
-- **Additonal methods like #max, #min, and #sort**
+- **Additonal features**
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -79,7 +78,7 @@ Clone this repository to your desired folder:
 
 Contributions, issues, and feature requests are welcome!
 
-Feel free to check the [issues page](https://github.com/mershark/Enumerable/issues).
+Feel free to check the [issues page](https://github.com/mershark/oop-school-library/issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
