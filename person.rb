@@ -1,8 +1,11 @@
-class Person
+require_relative 'nameable'
+
+class Person < Nameable
   attr_reader :id
   attr_accessor :name, :age
 
   def initialize(age, name = 'Unknown', parent_permission: true)
+    super()
     @id = Random.rand(1_000_000..9_999_999)
     @name = name
     @age = age
