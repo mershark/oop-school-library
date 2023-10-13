@@ -73,18 +73,28 @@ class LibraryApp
 
     case option
     when '1'
-      print 'Has parent permission? [Y/N]: '
-      permission = gets.chomp.downcase
-      @people << Student.new(age, name, parent_permission: (permission == 'y'))
+      create_student(age, name)
     when '2'
-      print 'Specialization: '
-      specialization = gets.chomp
-      @people << Teacher.new(age, specialization, name)
+      create_teacher(age, name)
     else
       puts 'Invalid option. Please select 1 for Student or 2 for Teacher.'
     end
+  end
 
-    puts 'Person Created Successfully'
+  def create_student(age, name)
+    print 'Has parent permission? [Y/N]: '
+    permission = gets.chomp.downcase
+    print 'Classroom: '
+    classroom = gets.chomp
+    @people << Student.new(age, classroom, name, parent_permission: (permission == 'y'))
+    puts 'Student Created Successfully'
+  end
+
+  def create_teacher(age, name)
+    print 'Specialization: '
+    specialization = gets.chomp
+    @people << Teacher.new(age, specialization, name)
+    puts 'Teacher Created Successfully'
   end
 
   def create_book
@@ -98,24 +108,21 @@ class LibraryApp
 
   def create_rental
     puts 'Select a book from the following list by number'
-    @books.each_with_index { |book, index| puts "#{index}) Title: \"#{book.title}\", Author: #{book.author}" }
+    display_books
     book_index = gets.chomp.to_i
 
+    return puts('Invalid book selection.') if book_index.negative? || book_index >= @books.length
+
     puts 'Select a person from the following list by number (not ID)'
-    @people.each_with_index do |person, index|
-      if person.is_a?(Student)
-        puts "#{index}) [Student] Name: \"#{person.name}\", ID: #{person.id}, Age: #{person.age}"
-      elsif person is_a?(Teacher)
-        puts "#{index}) [Teacher] Name: \"#{person.name}\", ID: #{person.id}, Age: #{person.age}"
-      end
-    end
+    display_people
     person_index = gets.chomp.to_i
+
+    return puts('Invalid person selection.') if person_index.negative? || person_index >= @people.length
 
     print 'Date (YYYY/MM/DD): '
     date = gets.chomp
 
-    @rentals << Rental.new(date, @books[book_index], @people[person_index])
-    puts 'Rental Created Successfully'
+    create_rental_with_indexes(date, book_index, person_index)
   end
 
   def list_rentals
@@ -127,6 +134,24 @@ class LibraryApp
         puts "Date: #{rental.date}, Book \"#{rental.book.title}\" by #{rental.book.author.capitalize}"
       end
     end
+  end
+
+  private
+
+  def display_books
+    @books.each_with_index { |book, index| puts "#{index}) Title: \"#{book.title}\", Author: #{book.author}" }
+  end
+
+  def display_people
+    @people.each_with_index do |person, index|
+      person_type = person.is_a?(Student) ? 'Student' : 'Teacher'
+      puts "#{index}) [#{person_type}] Name: \"#{person.name}\", ID: #{person.id}, Age: #{person.age}"
+    end
+  end
+
+  def create_rental_with_indexes(date, book_index, person_index)
+    @rentals << Rental.new(date, @books[book_index], @people[person_index])
+    puts 'Rental Created Successfully'
   end
 end
 
