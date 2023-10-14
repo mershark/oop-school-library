@@ -117,7 +117,7 @@ class LibraryApp
     display_people
     person_index = gets.chomp.to_i
 
-    return puts('Invalid person selection.') if person_index.negative? || person_index >= @people.length
+    return puts('Invalid person selection.') if person_index.negative? || person_index > @people.length
 
     print 'Date (YYYY/MM/DD): '
     date = gets.chomp
