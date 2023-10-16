@@ -3,6 +3,7 @@ require_relative 'book'
 require_relative 'rental'
 require_relative 'student'
 require_relative 'teacher'
+require_relative 'menu'
 
 class LibraryApp
   def initialize
@@ -13,21 +14,10 @@ class LibraryApp
 
   def run
     loop do
-      display_menu
+      Menu.display_library_menu
       choice = gets.chomp.to_i
       handle_choice(choice)
     end
-  end
-
-  def display_menu
-    puts 'Library Management System'
-    puts '1. List Books'
-    puts '2. List People'
-    puts '3. Create Person'
-    puts '4. Create Book'
-    puts '5. Create Rental'
-    puts '6. List Rentals by Person ID'
-    puts '7. Exit'
   end
 
   def handle_choice(choice)
@@ -43,7 +33,7 @@ class LibraryApp
 
     action = choice_actions[choice]
     if action
-      send(action) # Call the corresponding method
+      send(action)
     else
       puts 'Invalid choice. Please select a valid option.'
     end
@@ -64,14 +54,11 @@ class LibraryApp
   end
 
   def create_person
-    print 'Do you want to create a Student (1) or a Teacher (2)? [Input the number]: '
-    option = gets.chomp
-    print 'Age: '
-    age = gets.chomp
-    print 'Name: '
-    name = gets.chomp
+    person_type = person_type_prompt
+    age = age_prompt
+    name = name_prompt
 
-    case option
+    case person_type
     when '1'
       create_student(age, name)
     when '2'
@@ -81,13 +68,37 @@ class LibraryApp
     end
   end
 
+  def person_type_prompt
+    print 'Do you want to create a Student (1) or a Teacher (2)? [Input the number]: '
+    gets.chomp
+  end
+
+  def age_prompt
+    print 'Age: '
+    gets.chomp
+  end
+
+  def name_prompt
+    print 'Name: '
+    gets.chomp
+  end
+
   def create_student(age, name)
-    print 'Has parent permission? [Y/N]: '
-    permission = gets.chomp.downcase
-    print 'Classroom: '
-    classroom = gets.chomp
-    @people << Student.new(age, classroom, name, parent_permission: (permission == 'y'))
+    permission = parent_permission_prompt
+    classroom = classroom_prompt
+    parent_permission = permission == 'y'
+    @people << Student.new(age, classroom, name, parent_permission: parent_permission)
     puts 'Student Created Successfully'
+  end
+
+  def parent_permission_prompt
+    print 'Has parent permission? [Y/N]: '
+    gets.chomp.downcase
+  end
+
+  def classroom_prompt
+    print 'Classroom: '
+    gets.chomp
   end
 
   def create_teacher(age, name)
@@ -107,22 +118,38 @@ class LibraryApp
   end
 
   def create_rental
+    book_index = select_book
+    return unless book_index
+
+    person_index = select_person
+    return unless person_index
+
+    date = input_date
+
+    create_rental_with_indexes(date, book_index, person_index)
+  end
+
+  def select_book
     puts 'Select a book from the following list by number'
     display_books
     book_index = gets.chomp.to_i
+    return nil if book_index.negative? || book_index >= @books.length
 
-    return puts('Invalid book selection.') if book_index.negative? || book_index >= @books.length
+    book_index
+  end
 
+  def select_person
     puts 'Select a person from the following list by number (not ID)'
     display_people
     person_index = gets.chomp.to_i
+    return nil if person_index.negative? || person_index >= @people.length
 
-    return puts('Invalid person selection.') if person_index.negative? || person_index >= @people.length
+    person_index
+  end
 
+  def input_date
     print 'Date (YYYY/MM/DD): '
-    date = gets.chomp
-
-    create_rental_with_indexes(date, book_index, person_index)
+    gets.chomp
   end
 
   def list_rentals
@@ -154,6 +181,3 @@ class LibraryApp
     puts 'Rental Created Successfully'
   end
 end
-
-app = LibraryApp.new
-app.run

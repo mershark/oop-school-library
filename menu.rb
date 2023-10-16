@@ -11,4 +11,15 @@ class Menu
   def self.display
     puts MENU
   end
+
+  def self.display_library_menu
+    puts 'Library Management System'
+    puts '1. List Books'
+    puts '2. List People'
+    puts '3. Create Person'
+    puts '4. Create Book'
+    puts '5. Create Rental'
+    puts '6. List Rentals by Person ID'
+    puts '7. Exit'
+  end
 end

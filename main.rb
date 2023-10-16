@@ -9,7 +9,7 @@ def main
   until get == 7
     Menu.display
     get = gets.chomp.to_i
-    app.execute(get)
+    app.handle_choice(get)
   end
   puts 'Thank you for using this app!'
 end
