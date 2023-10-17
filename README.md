@@ -62,6 +62,12 @@ Clone this repository to your desired folder:
 - GitHub: [@githubhandle](https://github.com/mershark)
 - LinkedIn: [Profile link](https://www.linkedin.com/in/mershark/)
 
+👤 **Ricardo Egas**
+
+- GitHub: [@githubhandle](https://github.com/RicardoEgas)
+- Twitter: [@twitterhandle](https://twitter.com/RjEgas)
+- LinkedIn: [LinkedIn](https://www.linkedin.com/in/ricardo-egas-952125136)
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- FUTURE FEATURES -->
