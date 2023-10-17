@@ -4,12 +4,14 @@ require_relative 'rental'
 require_relative 'student'
 require_relative 'teacher'
 require_relative 'menu'
+require 'json'
 
 class LibraryApp
   def initialize
     @people = []
     @books = []
     @rentals = []
+    load_books('books.json')
   end
 
   def run
@@ -19,6 +21,30 @@ class LibraryApp
       handle_choice(choice)
     end
   end
+
+  def save_books(filename)
+    data_to_save = {
+      books: @books
+    }
+    File.open(filename, 'w') do |file|
+      json_data = JSON.dump(data_to_save)
+      file.write(json_data)
+    end
+  end
+
+  def load_books(filename)
+    if File.exist?(filename)
+      json_data = File.read(filename)
+      data = JSON.parse(json_data)
+      books_data = data['books']
+      @books = books_data.map do |book_data|
+        Book.new(book_data['title'], book_data['author'])
+      end
+    else
+      @books = []
+    end
+  end
+  
 
   def handle_choice(choice)
     choice_actions = {
@@ -113,8 +139,20 @@ class LibraryApp
     title = gets.chomp
     print 'Author: '
     author = gets.chomp
-    @books << Book.new(title, author)
+    new_book = Book.new(title, author)
+    @books << new_book
+    save_books('books.json')
     puts 'Book Created Successfully'
+  end
+  
+  def save_books(filename)
+    data_to_save = {
+      books: @books.map(&:to_hash)
+    }
+    File.open(filename, 'w') do |file|
+      json_data = JSON.dump(data_to_save)
+      file.write(json_data)
+    end
   end
 
   def create_rental
