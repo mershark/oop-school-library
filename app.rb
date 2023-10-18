@@ -12,6 +12,8 @@ class LibraryApp
     @books = []
     @rentals = []
     load_books('books.json')
+    load_people('people.json')
+    load_rentals('rentals.json')
   end
 
   def run
@@ -24,7 +26,7 @@ class LibraryApp
 
   def save_books(filename)
     data_to_save = {
-      books: @books
+      books: @books.map(&:to_hash)
     }
     File.open(filename, 'w') do |file|
       json_data = JSON.dump(data_to_save)
@@ -44,7 +46,70 @@ class LibraryApp
       @books = []
     end
   end
-  
+
+  def save_rentals(filename)
+    data_to_save = {
+      rentals: @rentals.map(&:to_hash)
+    }
+    File.open(filename, 'w') do |file|
+      json_data = JSON.dump(data_to_save)
+      file.write(json_data)
+    end
+  end
+
+  def load_rentals(filename)
+    if File.exist?(filename)
+      json_data = File.read(filename)
+      data = JSON.parse(json_data)
+      rentals_data = data['rentals']
+
+      @rentals = rentals_data.map do |rental_data|
+        book = find_book_by_title(rental_data['book']['title'])
+        person = find_person_by_id(rental_data['person']['id'])
+
+        Rental.new(rental_data['date'], book, person) if book && person
+      end.compact
+    else
+      @rentals = []
+    end
+  end
+
+  def save_people(filename)
+    data_to_save = {
+      people: @people.map(&:to_hash)
+    }
+    File.open(filename, 'w') do |file|
+      json_data = JSON.dump(data_to_save)
+      file.write(json_data)
+    end
+  end
+
+  def load_people(filename)
+    if File.exist?(filename)
+      json_data = File.read(filename)
+      data = JSON.parse(json_data)
+      people_data = data['people']
+      @people = people_data.map do |person_data|
+        if person_data['classroom']
+          Student.new(person_data['age'], person_data['classroom'], person_data['name'],
+                      parent_permission: person_data['parent_permission'])
+        else
+          Teacher.new(person_data['age'], person_data['specialization'], person_data['name'],
+                      parent_permission: person_data['parent_permission'])
+        end
+      end
+    else
+      @people = []
+    end
+  end
+
+  def find_book_by_title(title)
+    @books.find { |book| book.title == title }
+  end
+
+  def find_person_by_id(id)
+    @people.find { |p| p.id == id }
+  end
 
   def handle_choice(choice)
     choice_actions = {
@@ -60,6 +125,9 @@ class LibraryApp
     action = choice_actions[choice]
     if action
       send(action)
+      save_books('books.json')
+      save_people('people.json')
+      save_rentals('rentals.json')
     else
       puts 'Invalid choice. Please select a valid option.'
     end
@@ -75,7 +143,8 @@ class LibraryApp
   def list_people
     puts 'List of People:'
     @people.each do |person|
-      puts "[#{person.class}] Name: #{person.name.capitalize}, ID: #{person.id}, Age: #{person.age}"
+      person_type = person.is_a?(Student) ? 'Student' : 'Teacher'
+      puts "#{person_type} Name: #{person.name.capitalize}, ID: #{person.id}, Age: #{person.age}"
     end
   end
 
@@ -115,6 +184,7 @@ class LibraryApp
     parent_permission = permission == 'y'
     @people << Student.new(age, classroom, name, parent_permission: parent_permission)
     puts 'Student Created Successfully'
+    save_people('people.json') # Save people data after creating a student
   end
 
   def parent_permission_prompt
@@ -132,6 +202,7 @@ class LibraryApp
     specialization = gets.chomp
     @people << Teacher.new(age, specialization, name)
     puts 'Teacher Created Successfully'
+    save_people('people.json') # Save people data after creating a teacher
   end
 
   def create_book
@@ -141,18 +212,8 @@ class LibraryApp
     author = gets.chomp
     new_book = Book.new(title, author)
     @books << new_book
-    save_books('books.json')
+    save_books('books.json') # Save book data after creating a book
     puts 'Book Created Successfully'
-  end
-  
-  def save_books(filename)
-    data_to_save = {
-      books: @books.map(&:to_hash)
-    }
-    File.open(filename, 'w') do |file|
-      json_data = JSON.dump(data_to_save)
-      file.write(json_data)
-    end
   end
 
   def create_rental
@@ -217,5 +278,6 @@ class LibraryApp
   def create_rental_with_indexes(date, book_index, person_index)
     @rentals << Rental.new(date, @books[book_index], @people[person_index])
     puts 'Rental Created Successfully'
+    save_rentals('rentals.json') # Save rental data after creating a rental
   end
 end

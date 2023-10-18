@@ -4,9 +4,12 @@ class Person < Nameable
   attr_reader :id
   attr_accessor :name, :age, :rentals
 
+  @@id_counter = 0 # Add a class variable to keep track of IDs.
+
   def initialize(age, name = 'Unknown', parent_permission: true)
     super()
-    @id = Random.rand(1_000_000..9_999_999)
+    @@id_counter += 1 # Increment the ID counter.
+    @id = @@id_counter # Use the ID counter for the ID.
     @name = name
     @age = age
     @parent_permission = parent_permission
