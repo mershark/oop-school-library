@@ -5,9 +5,18 @@ require_relative 'student'
 require_relative 'teacher'
 require_relative 'menu'
 require_relative 'data_manager'
+require_relative 'book_manager'
+require_relative 'person_manager'
+require_relative 'book_creation_manager'
+require_relative 'rental_manager'
 
 class LibraryApp
   include DataManager
+  include BookManager
+  include PersonManager
+  include BookCreationManager
+  include RentalManager
+
   def initialize
     @people = []
     @books = []
@@ -100,81 +109,6 @@ class LibraryApp
     gets.chomp
   end
 
-  def create_student(age, name)
-    permission = parent_permission_prompt
-    classroom = classroom_prompt
-    parent_permission = permission == 'y'
-    student = Student.new(age, classroom, name, parent_permission: parent_permission)
-    @people << student
-    puts 'Student Created Successfully'
-    save_people('people.json', @people) # Save people data after creating a student
-  end
-
-  def parent_permission_prompt
-    print 'Has parent permission? [Y/N]: '
-    gets.chomp.downcase
-  end
-
-  def classroom_prompt
-    print 'Classroom: '
-    gets.chomp
-  end
-
-  def create_teacher(age, name)
-    print 'Specialization: '
-    specialization = gets.chomp
-    teacher = Teacher.new(age, specialization, name)
-    @people << teacher
-    puts 'Teacher Created Successfully'
-    save_people('people.json', @people) # Save people data after creating a teacher
-  end
-
-  def create_book
-    print 'Title: '
-    title = gets.chomp
-    print 'Author: '
-    author = gets.chomp
-    new_book = Book.new(title, author)
-    @books << new_book
-    puts 'Book Created Successfully'
-    save_books('books.json', @books) # Save book data after creating a book
-  end
-
-  def create_rental
-    book_index = select_book
-    return unless book_index
-
-    person_index = select_person
-    return unless person_index
-
-    date = input_date
-
-    create_rental_with_indexes(date, book_index, person_index)
-  end
-
-  def select_book
-    puts 'Select a book from the following list by number'
-    display_books
-    book_index = gets.chomp.to_i
-    return nil if book_index.negative? || book_index >= @books.length
-
-    book_index
-  end
-
-  def select_person
-    puts 'Select a person from the following list by number (not ID)'
-    display_people
-    person_index = gets.chomp.to_i
-    return nil if person_index.negative? || person_index >= @people.length
-
-    person_index
-  end
-
-  def input_date
-    print 'Date (YYYY/MM/DD): '
-    gets.chomp
-  end
-
   def list_rentals
     print 'ID of person: '
     person_id = gets.chomp.to_i
@@ -188,20 +122,9 @@ class LibraryApp
 
   private
 
-  def display_books
-    @books.each_with_index { |book, index| puts "#{index}) Title: \"#{book.title}\", Author: #{book.author}" }
-  end
-
-  def display_people
-    @people.each_with_index do |person, index|
-      person_type = person.is_a?(Student) ? 'Student' : 'Teacher'
-      puts "#{index}) [#{person_type}] Name: \"#{person.name}\", ID: #{person.id}, Age: #{person.age}"
-    end
-  end
-
   def create_rental_with_indexes(date, book_index, person_index)
     @rentals << Rental.new(date, @books[book_index], @people[person_index])
     puts 'Rental Created Successfully'
-    save_rentals('rentals.json', @rentals) # Save rental data after creating a rental
+    save_rentals('rentals.json', @rentals)
   end
 end

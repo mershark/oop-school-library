@@ -1,3 +1,5 @@
+require_relative 'student'
+require_relative 'teacher'
 require 'json'
 
 module DataManager
