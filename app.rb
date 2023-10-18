@@ -4,12 +4,26 @@ require_relative 'rental'
 require_relative 'student'
 require_relative 'teacher'
 require_relative 'menu'
+require_relative 'data_manager'
+require_relative 'book_manager'
+require_relative 'person_manager'
+require_relative 'book_creation_manager'
+require_relative 'rental_manager'
 
 class LibraryApp
+  include DataManager
+  include BookManager
+  include PersonManager
+  include BookCreationManager
+  include RentalManager
+
   def initialize
     @people = []
     @books = []
     @rentals = []
+    load_books('books.json')
+    load_people('people.json')
+    load_rentals('rentals.json')
   end
 
   def run
@@ -18,6 +32,14 @@ class LibraryApp
       choice = gets.chomp.to_i
       handle_choice(choice)
     end
+  end
+
+  def find_book_by_title(title)
+    @books.find { |book| book.title == title }
+  end
+
+  def find_person_by_id(id)
+    @people.find { |p| p.id == id }
   end
 
   def handle_choice(choice)
@@ -34,6 +56,9 @@ class LibraryApp
     action = choice_actions[choice]
     if action
       send(action)
+      save_books('books.json', @books)
+      save_people('people.json', @people)
+      save_rentals('rentals.json', @rentals)
     else
       puts 'Invalid choice. Please select a valid option.'
     end
@@ -49,7 +74,8 @@ class LibraryApp
   def list_people
     puts 'List of People:'
     @people.each do |person|
-      puts "[#{person.class}] Name: #{person.name.capitalize}, ID: #{person.id}, Age: #{person.age}"
+      person_type = person.is_a?(Student) ? 'Student' : 'Teacher'
+      puts "#{person_type} Name: #{person.name.capitalize}, ID: #{person.id}, Age: #{person.age}"
     end
   end
 
@@ -83,75 +109,6 @@ class LibraryApp
     gets.chomp
   end
 
-  def create_student(age, name)
-    permission = parent_permission_prompt
-    classroom = classroom_prompt
-    parent_permission = permission == 'y'
-    @people << Student.new(age, classroom, name, parent_permission: parent_permission)
-    puts 'Student Created Successfully'
-  end
-
-  def parent_permission_prompt
-    print 'Has parent permission? [Y/N]: '
-    gets.chomp.downcase
-  end
-
-  def classroom_prompt
-    print 'Classroom: '
-    gets.chomp
-  end
-
-  def create_teacher(age, name)
-    print 'Specialization: '
-    specialization = gets.chomp
-    @people << Teacher.new(age, specialization, name)
-    puts 'Teacher Created Successfully'
-  end
-
-  def create_book
-    print 'Title: '
-    title = gets.chomp
-    print 'Author: '
-    author = gets.chomp
-    @books << Book.new(title, author)
-    puts 'Book Created Successfully'
-  end
-
-  def create_rental
-    book_index = select_book
-    return unless book_index
-
-    person_index = select_person
-    return unless person_index
-
-    date = input_date
-
-    create_rental_with_indexes(date, book_index, person_index)
-  end
-
-  def select_book
-    puts 'Select a book from the following list by number'
-    display_books
-    book_index = gets.chomp.to_i
-    return nil if book_index.negative? || book_index >= @books.length
-
-    book_index
-  end
-
-  def select_person
-    puts 'Select a person from the following list by number (not ID)'
-    display_people
-    person_index = gets.chomp.to_i
-    return nil if person_index.negative? || person_index >= @people.length
-
-    person_index
-  end
-
-  def input_date
-    print 'Date (YYYY/MM/DD): '
-    gets.chomp
-  end
-
   def list_rentals
     print 'ID of person: '
     person_id = gets.chomp.to_i
@@ -165,19 +122,9 @@ class LibraryApp
 
   private
 
-  def display_books
-    @books.each_with_index { |book, index| puts "#{index}) Title: \"#{book.title}\", Author: #{book.author}" }
-  end
-
-  def display_people
-    @people.each_with_index do |person, index|
-      person_type = person.is_a?(Student) ? 'Student' : 'Teacher'
-      puts "#{index}) [#{person_type}] Name: \"#{person.name}\", ID: #{person.id}, Age: #{person.age}"
-    end
-  end
-
   def create_rental_with_indexes(date, book_index, person_index)
     @rentals << Rental.new(date, @books[book_index], @people[person_index])
     puts 'Rental Created Successfully'
+    save_rentals('rentals.json', @rentals)
   end
 end
