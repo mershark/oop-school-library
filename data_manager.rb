@@ -62,7 +62,6 @@ module DataManager
     end
   end
 
-
   private
 
   def save_to_json(filename, data)
