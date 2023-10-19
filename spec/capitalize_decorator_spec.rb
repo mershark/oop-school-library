@@ -1,5 +1,4 @@
 require_relative '../person'
-require_relative '../person'
 require_relative '../capitalize_decorator'
 require 'rspec'
 
